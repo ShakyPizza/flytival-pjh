@@ -1,0 +1,11 @@
+# repos for quick access via r+N in the project launcher by PJH
+
+repositories:
+    - path: "/Users/[þú]/Documents/forritun/Ding dong"
+      name: "Dingdong1"
+
+    - path: "/Users/[þú]/Documents/forritun/fvrnsk"
+      name: "fersvatnsrannsoknir"
+
+    - path: "/Users/[þú]/Documents/forritun/Ding dong 3"
+      name: "Dingdong3"

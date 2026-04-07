@@ -1,0 +1,15 @@
+projects:
+  - name: "Ding dong"
+    folder: "/Users/[þú]/Documents/forritun/Ding dong"
+    status: active
+
+  - name: "Ferskvatnsrannsóknir"
+    folder: "/Users/[þú]/Documents/forritun/fvrnsk"
+    status: active
+
+  - name: "Ding dong 3"
+    folder: "/Users/[þú]/Documents/forritun/Ding dong3"
+    status: archived
+
+    
+
