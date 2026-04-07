@@ -1,6 +1,6 @@
 # Claude Code / Codex Project Switcher
 
-A terminal project launcher for [Claude Code](https://claude.ai/code) and Codex. Press a single key to jump into any project and launch your coding agent in the right directory.
+A terminal project launcher for [Claude Code](https://claude.ai/code) and Codex. Press `cc` or `cx` to jump into any project and launch your coding agent in the right directory.
 
 Based on [Peter Hartree's guide](https://wow.pjh.is/journal/claude-code-project-switcher).
 
@@ -121,7 +121,7 @@ Fields:
 
 ## Usage
 
-Run `cc` from your terminal. The menu looks like this:
+Run `cc` or `cx` from your terminal. The menu looks like this:
 
 ```
   Good morning, Kjartan!
