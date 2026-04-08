@@ -1,0 +1,12 @@
+projects:
+  - name: "My App"
+    folder: "/Users/you/projects/my-app"
+    status: active
+
+  - name: "API Server"
+    folder: "/Users/you/projects/api-server"
+    status: active
+
+  - name: "Old Website"
+    folder: "/Users/you/projects/old-website"
+    status: archived
