@@ -1,6 +1,6 @@
 # Claude Code / Codex Project Switcher
 
-A terminal project launcher for [Claude Code](https://claude.ai/code) and Codex. Press `cc` or `cx` to jump into any project and launch your coding agent in the right directory.
+A terminal project launcher for [Claude Code](https://claude.ai/code) and Codex. Press `cc` to jump into any project and launch your coding agent in the right directory.
 
 Based on [Peter Hartree's guide](https://wow.pjh.is/journal/claude-code-project-switcher).
 
@@ -8,7 +8,7 @@ Based on [Peter Hartree's guide](https://wow.pjh.is/journal/claude-code-project-
 
 ## How it works
 
-Run the launcher from your shell. It displays an interactive menu of your projects, pinned repositories, and recently visited directories. Press a key to select — the script outputs the chosen path so a shell function can `cd` into it and launch Claude Code (or Codex).
+Run `cc` from your shell. It displays an interactive menu of your projects, pinned repositories, and recently visited directories. Press a key to select — the script outputs the chosen path so a shell function can `cd` into it and launch Claude Code (or Codex).
 
 Menu output goes to `stderr`; the selected path goes to `stdout` — that's what makes shell integration clean.
 
@@ -29,25 +29,33 @@ pip install pyyaml
 
 ### 1. Place the files
 
-The script expects these files under `~/Documents/forritun/`:
+Clone or copy this repo to wherever you'd like to keep it, e.g.:
 
 ```
-~/Documents/forritun/
+~/your/chosen/path/
 ├── coding_agent_launcher.py
 ├── projects.yaml
 └── repositories.yaml
 ```
 
-Clone or copy this repo there, or adjust the paths at the top of `coding_agent_launcher.py` if you want a different location.
+Then open `coding_agent_launcher.py` and update the path constants near the top to match your chosen location:
+
+```python
+PROJECTS_DIR = Path.home() / "your" / "chosen" / "path"
+```
 
 ### 2. Add a shell function
 
-Add this to your `~/.zshrc` or `~/.bashrc`:
+Add this to your `~/.zshrc` or `~/.bashrc`, replacing the path with wherever you placed the files:
 
 ```bash
 function cc() {
+  if [[ "$1" == "np" || "$1" == "nr" ]]; then
+    python3 ~/your/chosen/path/coding_agent_launcher.py "$1" "${@:2}" "$PWD"
+    return
+  fi
   local dir
-  dir=$(python3 ~/Documents/forritun/coding_agent_launcher.py "$PWD")
+  dir=$(python3 ~/your/chosen/path/coding_agent_launcher.py "$PWD")
   if [ $? -eq 0 ] && [ -n "$dir" ]; then
     cd "$dir" && claude
   fi
@@ -58,13 +66,7 @@ Replace `claude` with `codex` or any other command you want to launch after swit
 
 ### 3. Track recent directories (optional)
 
-To populate the **Recent** section, append the current directory to `~/.cc_recent_dirs` each time you open a new shell. Add this to your `~/.zshrc`:
-
-```bash
-echo "$PWD" >> ~/.cc_recent_dirs
-```
-
-Or use a `chpwd` hook (zsh) to track every directory change:
+To populate the **Recent** section, use a `chpwd` hook (zsh) to track every directory change:
 
 ```bash
 chpwd() { echo "$PWD" >> ~/.cc_recent_dirs }
@@ -79,11 +81,11 @@ Lists your projects. Only `active` projects appear by default; archived ones are
 ```yaml
 projects:
   - name: "My Project"
-    folder: "/Users/you/Documents/forritun/my-project"
+    folder: "/Users/you/path/to/my-project"
     status: active
 
   - name: "Old Project"
-    folder: "/Users/you/Documents/forritun/old-project"
+    folder: "/Users/you/path/to/old-project"
     status: archived
 ```
 
@@ -103,10 +105,10 @@ A separate list of pinned repositories accessible with `r` + a digit (e.g. `r1`,
 
 ```yaml
 repositories:
-  - path: "/Users/you/Documents/forritun/my-repo"
+  - path: "/Users/you/path/to/my-repo"
     name: "my-repo"
 
-  - path: "/Users/you/Documents/forritun/another-repo"
+  - path: "/Users/you/path/to/another-repo"
     name: "another-repo"
 ```
 
@@ -121,10 +123,10 @@ Fields:
 
 ## Usage
 
-Run `cc` or `cx` from your terminal. The menu looks like this:
+Run `cc` from your terminal. The menu looks like this:
 
 ```
-  Good morning, Kjartan!
+  Good morning!
 
   Projects & repos:
   ┌───┬─────────────────────┬────┬──────────────────┐
@@ -135,7 +137,7 @@ Run `cc` or `cx` from your terminal. The menu looks like this:
 
   Recent:
   ┌───┬──────────────────────┐
-  │ a │ forritun/some-dir    │
+  │ a │ projects/some-dir    │
   └───┴──────────────────────┘
 
   ^Z archived (+1)  ^C quit
@@ -155,13 +157,22 @@ Run `cc` or `cx` from your terminal. The menu looks like this:
 | `Ctrl+A`     | Show all recent directories                 |
 | `Ctrl+C`     | Quit                                        |
 
+### Adding projects and repositories
+
+```bash
+cc np "My New Project"   # add a new project entry to projects.yaml
+cc nr "my-new-repo"      # add a new repository entry to repositories.yaml
+```
+
+Both commands prompt you to either use the current directory or enter a path manually.
+
 ### Direct selection (optional)
 
 You can also call the script with `--select` to skip the interactive menu:
 
 ```bash
-python3 ~/Documents/forritun/coding_agent_launcher.py --select 1
-python3 ~/Documents/forritun/coding_agent_launcher.py --select r2
+python3 ~/your/chosen/path/coding_agent_launcher.py --select 1
+python3 ~/your/chosen/path/coding_agent_launcher.py --select r2
 ```
 
 This is useful for scripting or keybinding shortcuts outside the menu.

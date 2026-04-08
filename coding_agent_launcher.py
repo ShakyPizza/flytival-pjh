@@ -23,7 +23,7 @@ from pathlib import Path
 import yaml
 
 
-PROJECTS_DIR = Path.home() / "Documents" / "forritun"
+PROJECTS_DIR = Path.home() / "Documents" / "github_repos" / "flytival-pjh"
 PROJECTS_FILE = PROJECTS_DIR / "projects.yaml"
 REPOS_FILE = PROJECTS_DIR / "repositories.yaml"
 RECENT_DIRS_FILE = Path.home() / ".cc_recent_dirs"
@@ -353,6 +353,88 @@ def select_option(idx: int, displayed_projects: list[dict], displayed_recent: li
     return False
 
 
+def add_project(name: str, folder: str):
+    """Append a new active project entry to projects.yaml."""
+    if not PROJECTS_FILE.exists():
+        print(f"projects.yaml not found: {PROJECTS_FILE}", file=sys.stderr)
+        sys.exit(1)
+
+    projects = load_projects()
+    for p in projects:
+        if p.get("name") == name:
+            print(f"Project '{name}' already exists.", file=sys.stderr)
+            sys.exit(1)
+        if p.get("folder") == folder:
+            print(f"Folder already registered as '{p.get('name')}'.", file=sys.stderr)
+            sys.exit(1)
+
+    folder_path = Path(folder).expanduser()
+    if not folder_path.exists():
+        folder_path.mkdir(parents=True)
+        print(f"Created directory: {folder_path}", file=sys.stderr)
+
+    entry = f'\n  - name: "{name}"\n    folder: "{folder_path}"\n    status: active\n'
+    with open(PROJECTS_FILE, "a") as f:
+        f.write(entry)
+
+    print(f"Added project '{name}' → {folder_path}", file=sys.stderr)
+
+
+def add_repo(name: str, path: str):
+    """Append a new repository entry to repositories.yaml."""
+    if not REPOS_FILE.exists():
+        print(f"repositories.yaml not found: {REPOS_FILE}", file=sys.stderr)
+        sys.exit(1)
+
+    repos = load_repositories()
+    for r in repos:
+        if r.get("name") == name:
+            print(f"Repository '{name}' already exists.", file=sys.stderr)
+            sys.exit(1)
+        if r.get("path") == path:
+            print(f"Path already registered as '{r.get('name')}'.", file=sys.stderr)
+            sys.exit(1)
+
+    repo_path = Path(path).expanduser()
+    if not repo_path.exists():
+        repo_path.mkdir(parents=True)
+        print(f"Created directory: {repo_path}", file=sys.stderr)
+
+    entry = f'\n  - path: "{repo_path}"\n    name: "{name}"\n'
+    with open(REPOS_FILE, "a") as f:
+        f.write(entry)
+
+    print(f"Added repository '{name}' → {repo_path}", file=sys.stderr)
+
+
+def prompt_folder(current_dir: str) -> str:
+    """Ask the user how to set the folder for a new project."""
+    print(f"\n  Set project folder:", file=sys.stderr)
+    print(f"  {CYAN}{BOLD}1{RESET}  Use current directory  {DIM}({current_dir}){RESET}", file=sys.stderr)
+    print(f"  {CYAN}{BOLD}2{RESET}  Enter path manually", file=sys.stderr)
+    print(file=sys.stderr)
+
+    while True:
+        ch = getch()
+        if ch == '1':
+            print(file=sys.stderr)
+            return current_dir
+        elif ch == '2':
+            # Restore normal terminal input for typing
+            fd = sys.stdin.fileno()
+            old_settings = termios.tcgetattr(fd)
+            try:
+                termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+                print(f"  Path: ", file=sys.stderr, end="", flush=True)
+                path = input()
+            finally:
+                pass
+            return path.strip()
+        elif ch in ('\x03', '\x04'):
+            print(file=sys.stderr)
+            sys.exit(1)
+
+
 def main():
     args = sys.argv[1:]
     select_key = None
@@ -365,6 +447,25 @@ def main():
         else:
             current_dir = args[i]
             i += 1
+
+    # np / nr subcommands — last positional arg is always $PWD from the shell function
+    if args and args[0] == 'np':
+        if len(args) < 2:
+            print("Usage: cc np PROJECT_NAME", file=sys.stderr)
+            sys.exit(1)
+        name = args[1]
+        folder = prompt_folder(current_dir)
+        add_project(name, folder)
+        sys.exit(0)
+
+    if args and args[0] == 'nr':
+        if len(args) < 2:
+            print("Usage: cc nr REPO_NAME", file=sys.stderr)
+            sys.exit(1)
+        name = args[1]
+        path = prompt_folder(current_dir)
+        add_repo(name, path)
+        sys.exit(0)
 
     if select_key is not None:
         projects = load_projects()

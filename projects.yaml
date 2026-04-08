@@ -1,15 +1,12 @@
 projects:
-  - name: "Ding dong"
-    folder: "/Users/[þú]/Documents/forritun/Ding dong"
+  - name: "My App"
+    folder: "/Users/you/projects/my-app"
     status: active
 
-  - name: "Ferskvatnsrannsóknir"
-    folder: "/Users/[þú]/Documents/forritun/fvrnsk"
+  - name: "API Server"
+    folder: "/Users/you/projects/api-server"
     status: active
 
-  - name: "Ding dong 3"
-    folder: "/Users/[þú]/Documents/forritun/Ding dong3"
+  - name: "Old Website"
+    folder: "/Users/you/projects/old-website"
     status: archived
-
-    
-
