@@ -368,11 +368,16 @@ def add_project(name: str, folder: str):
             print(f"Folder already registered as '{p.get('name')}'.", file=sys.stderr)
             sys.exit(1)
 
-    entry = f'\n  - name: "{name}"\n    folder: "{folder}"\n    status: active\n'
+    folder_path = Path(folder).expanduser()
+    if not folder_path.exists():
+        folder_path.mkdir(parents=True)
+        print(f"Created directory: {folder_path}", file=sys.stderr)
+
+    entry = f'\n  - name: "{name}"\n    folder: "{folder_path}"\n    status: active\n'
     with open(PROJECTS_FILE, "a") as f:
         f.write(entry)
 
-    print(f"Added project '{name}' → {folder}", file=sys.stderr)
+    print(f"Added project '{name}' → {folder_path}", file=sys.stderr)
 
 
 def add_repo(name: str, path: str):
@@ -390,11 +395,16 @@ def add_repo(name: str, path: str):
             print(f"Path already registered as '{r.get('name')}'.", file=sys.stderr)
             sys.exit(1)
 
-    entry = f'\n    - path: "{path}"\n      name: "{name}"\n'
+    repo_path = Path(path).expanduser()
+    if not repo_path.exists():
+        repo_path.mkdir(parents=True)
+        print(f"Created directory: {repo_path}", file=sys.stderr)
+
+    entry = f'\n  - path: "{repo_path}"\n    name: "{name}"\n'
     with open(REPOS_FILE, "a") as f:
         f.write(entry)
 
-    print(f"Added repository '{name}' → {path}", file=sys.stderr)
+    print(f"Added repository '{name}' → {repo_path}", file=sys.stderr)
 
 
 def prompt_folder(current_dir: str) -> str:
